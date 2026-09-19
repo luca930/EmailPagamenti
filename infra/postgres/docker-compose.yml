@@ -1,0 +1,42 @@
+# Postgres condiviso per il server. Si avvia una volta sola: ogni applicazione (questa
+# compresa) si collega dalla propria compose alla rete "condiviso" invece di portarsi
+# dietro un database tutto suo. Un container solo da tenere aggiornato e da salvare,
+# una base dati per applicazione dentro di lui.
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres-condiviso
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_SUPERUSER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_SUPERUSER_PASSWORD:?serve POSTGRES_SUPERUSER_PASSWORD nel file .env}
+      # Nessun POSTGRES_DB: le basi dati per le singole applicazioni si creano a parte,
+      # vedi README.md di questa cartella.
+      PGDATA: /var/lib/postgresql/data/pgdata
+
+    volumes:
+      - postgres-dati:/var/lib/postgresql/data
+
+    networks:
+      - condiviso
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_SUPERUSER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    security_opt:
+      - no-new-privileges:true
+
+    # Non esposto sull'host: solo i container sulla rete "condiviso" lo raggiungono.
+    # Per amministrarlo da fuori, collegarsi con `docker exec` (vedi README.md).
+
+networks:
+  condiviso:
+    name: condiviso
+
+volumes:
+  postgres-dati:
+    name: postgres-condiviso-dati

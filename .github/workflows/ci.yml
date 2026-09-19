@@ -31,3 +31,20 @@ jobs:
 
       - name: Test
         run: dotnet test EmailPagamenti.sln --configuration Release --no-build --verbosity normal
+
+  docker:
+    name: Immagine Docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Costruisce davvero l'immagine che finisce su Proxmox. Lo sviluppo di questo
+      # progetto gira in un ambiente con l'accesso a Docker Hub bloccato, quindi questo
+      # e' il solo posto dove il Dockerfile viene verificato per intero.
+      - name: Build immagine
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: emailpagamenti:ci

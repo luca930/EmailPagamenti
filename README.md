@@ -66,19 +66,49 @@ che la formula non cattura vengono cercati dalle espressioni comuni, che restano
 
 ## Avvio su Proxmox
 
+Il database e' **Postgres**, condiviso con le altre applicazioni che gireranno sullo stesso
+server: un container solo da tenere aggiornato e da salvare, invece di uno per applicazione.
+Vedi `infra/postgres/README.md` per il perche' e per come aggiungerne un'altra in futuro.
+
 ```bash
-git clone https://github.com/luca930/EmailPagamenti.git
-cd EmailPagamenti
+# Una volta sola per il server, non per applicazione:
+cd infra/postgres
 cp .env.example .env
-$EDITOR .env          # password dell'interfaccia e credenziali della casella
+$EDITOR .env                 # password del superutente Postgres
+docker compose up -d
+docker exec -it postgres-condiviso psql -U postgres   # crea la base "emailpagamenti", vedi il README
+
+# Poi per questa applicazione:
+cd ../..
+cp .env.example .env
+$EDITOR .env                 # password dell'interfaccia, credenziali della casella, utente Postgres
 docker compose up -d --build
 ```
 
-Poi l'interfaccia e' su `http://<indirizzo-del-server>:8080`. Il database sta nel volume
-`spese-dati`: e' l'unica cosa da mettere nei backup.
+Poi l'interfaccia e' su `http://<indirizzo-del-server>:8080`. Il database vive nel Postgres
+condiviso: e' quello che va salvato nei backup, non il volume `spese-dati` (che resta quasi
+vuoto — e' li' solo per spazio di lavoro futuro, come gli allegati).
 
 Alla prima esecuzione vengono letti dodici mesi di storico, poi si rilegge ogni quarto d'ora.
 Il bottone **Aggiorna** forza una lettura immediata.
+
+### Come si prova che funziona davvero
+
+1. Il file `.env` va riempito con l'indirizzo email **dove arrivano le notifiche di ING**
+   (non le credenziali di ING: quelle della casella di posta) e con una password per app se il
+   fornitore la richiede, come Gmail.
+2. Dopo `docker compose up -d --build`, i log del container mostrano l'acquisizione:
+   `docker compose logs -f spese`. La prima passata puo' metterci qualche minuto se la
+   casella ha molta posta.
+3. Aprendo `http://<indirizzo-del-server>:8080` e inserendo la password, i movimenti degli
+   ultimi dodici mesi dovrebbero gia' esserci nella tabella in basso, e i totali di ogni mese
+   nelle cifre in alto navigando con le frecce.
+4. Quello che il parser non ha letto bene finisce etichettato "da rivedere": aprendolo dalla
+   tabella si vede cosa ha capito e si corregge a mano. E' normale che i primi giorni ce ne
+   siano alcuni: e' proprio quello il modo per scoprire quali notifiche ING mancano ancora
+   dal profilo (vedi "La banca" piu' sopra).
+5. Se non arriva nulla, il sospetto numero uno e' `Imap__UserName`/`Imap__Password`:
+   `docker compose logs spese | grep -i imap` mostra l'errore di autenticazione, se c'e'.
 
 ## Sviluppo
 

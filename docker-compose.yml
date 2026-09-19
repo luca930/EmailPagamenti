@@ -7,7 +7,7 @@ services:
 
     ports:
       # Sulla LAN di casa basta questa. Per raggiungerla da fuori, mettere davanti
-      # un reverse proxy con certificato e accendere Security__RequireHttps.
+      # un reverse proxy con certificato e accendere Security__RichiediHttps.
       - "8080:8080"
 
     environment:
@@ -22,21 +22,33 @@ services:
       Imap__Password: ${IMAP_PASSWORD:?serve IMAP_PASSWORD nel file .env}
 
       # --- Database ---
-      Database__Provider: Sqlite
-      ConnectionStrings__Transactions: Data Source=/app/dati/pagamenti.db
+      # Postgres condiviso: vedi infra/postgres. Serve prima aver creato la base dati
+      # "emailpagamenti" con quel README, altrimenti l'applicazione non parte.
+      Database__Provider: Postgres
+      ConnectionStrings__Transactions: "Host=postgres-condiviso;Port=5432;Database=emailpagamenti;Username=${DB_UTENTE:-emailpagamenti};Password=${DB_PASSWORD:?serve DB_PASSWORD nel file .env}"
 
       # --- Acquisizione ---
       Ingestion__PollInterval: ${INTERVALLO:-00:15:00}
       Ingestion__InitialLookback: ${STORICO_INIZIALE:-365.00:00:00}
 
     volumes:
-      # Il database vive qui: e' l'unica cosa da salvare nei backup.
+      # Restano solo gli allegati/il vuoto di lavoro locale: il database vero sta su
+      # Postgres, che si salva a parte (vedi infra/postgres/README.md).
       - spese-dati:/app/dati
+
+    networks:
+      # Rete del Postgres condiviso, creata da infra/postgres/docker-compose.yml.
+      # Va avviato quello prima di questo, altrimenti la rete non esiste ancora.
+      - condiviso
 
     # Il servizio non ha bisogno di scrivere altrove ne' di privilegi aggiuntivi.
     read_only: false
     security_opt:
       - no-new-privileges:true
+
+networks:
+  condiviso:
+    external: true
 
 volumes:
   spese-dati:

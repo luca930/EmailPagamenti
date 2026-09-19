@@ -38,6 +38,16 @@ L'acquisizione periodica gira dentro la stessa applicazione web. Su un server di
 contenitore e' piu' semplice da aggiornare e da salvare di due. `EmailPagamenti.Worker` resta
 per chi volesse la sola acquisizione senza interfaccia.
 
+### Un Postgres condiviso, non uno per applicazione
+
+Su Proxmox il database e' un container Postgres a se' stante (`infra/postgres`), con la propria
+compose e il proprio volume, a cui EmailPagamenti si collega come client. Non fa parte del
+compose dell'applicazione apposta: altre applicazioni future useranno lo stesso container, con
+una base dati ciascuna, invece di portarsi dietro un Postgres a testa. Verificato con un Postgres
+16 vero, non solo scrivendo il compose: schema, aggregazioni per categoria e correzioni manuali
+funzionano identici a SQLite, come devono, dato che il codice applicativo non sa quale dei due
+database ha sotto.
+
 ### Interfaccia senza librerie
 
 Nessun framework, nessun passo di build, nessun CDN: i grafici sono SVG costruiti a mano. Cosi'
@@ -62,4 +72,4 @@ UID IMAP cambiano se la cartella viene ricreata. L'hash tiene l'indice a lunghez
 | Altre notifiche ING (carta, prelievo, addebito, accredito) | Formule plausibili, **da confermare su un esempio vero** |
 | Categorie | Elenco di partenza sulle catene italiane piu' diffuse, da estendere con l'uso |
 | Allegati | Si salvano nome e tipo, non il file. Le contabili PDF di ING restano nell'Area Riservata |
-| Database | SQLite per l'uso in casa; Postgres cambiando una sola chiave |
+| Database | Postgres condiviso su Proxmox (`infra/postgres`); SQLite resta supportato per lo sviluppo locale, cambiando una sola chiave |
