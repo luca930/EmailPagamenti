@@ -32,7 +32,7 @@ public sealed class ImapEmailSource : IEmailSource
     public string Name => "IMAP";
 
     public async IAsyncEnumerable<RawEmail> FetchAsync(
-        DateTimeOffset since,
+        DateTime since,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         var options = _options.CurrentValue;
@@ -69,7 +69,7 @@ public sealed class ImapEmailSource : IEmailSource
                 }
 
                 var uids = await folder
-                    .SearchAsync(SearchQuery.DeliveredAfter(since.UtcDateTime.Date), cancellationToken)
+                    .SearchAsync(SearchQuery.DeliveredAfter(since.Date), cancellationToken)
                     .ConfigureAwait(false);
 
                 _logger.LogInformation("Cartella {Folder}: {Count} email da valutare.", folderName, uids.Count);
@@ -138,7 +138,7 @@ public sealed class ImapEmailSource : IEmailSource
             from?.Address ?? "(sconosciuto)",
             from?.Name,
             message.Subject ?? string.Empty,
-            message.Date,
+            message.Date.UtcDateTime,
             message.TextBody,
             attachments);
     }

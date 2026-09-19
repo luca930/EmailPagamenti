@@ -7,6 +7,12 @@ public sealed class IngestionOptions
 {
     public const string SectionName = "Ingestion";
 
+    /// <summary>
+    /// Se falso, non si legge la casella da soli: l'acquisizione parte solo quando la si
+    /// chiede dall'interfaccia. Utile per provare l'applicazione senza collegare la posta.
+    /// </summary>
+    public bool Enabled { get; set; } = true;
+
     /// <summary>Quanto indietro guardare alla primissima esecuzione, quando il database e' vuoto.</summary>
     public TimeSpan InitialLookback { get; set; } = TimeSpan.FromDays(90);
 

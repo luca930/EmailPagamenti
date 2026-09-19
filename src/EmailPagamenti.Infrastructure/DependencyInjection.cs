@@ -4,6 +4,7 @@ using EmailPagamenti.Application.Parsing;
 using EmailPagamenti.Application.Pipeline;
 using EmailPagamenti.Infrastructure.Email;
 using EmailPagamenti.Infrastructure.Persistence;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,30 +32,53 @@ public static class DependencyInjection
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        services.AddOptions<ClassificationOptions>()
-            .Bind(configuration.GetSection(ClassificationOptions.SectionName));
+        services.AddOptions<BankOptions>()
+            .Bind(configuration.GetSection(BankOptions.SectionName));
+
+        services.AddOptions<CategoryOptions>()
+            .Bind(configuration.GetSection(CategoryOptions.SectionName));
 
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton<IEmailSource, ImapEmailSource>();
-        services.AddSingleton<IPaymentExtractor, RuleBasedPaymentExtractor>();
+        services.AddSingleton<ICategorizer, KeywordCategorizer>();
+        services.AddSingleton<ITransactionExtractor, BankNotificationExtractor>();
 
         AddPersistence(services, configuration);
 
-        services.AddScoped<IPaymentEmailRepository, EfPaymentEmailRepository>();
+        services.AddScoped<ITransactionRepository, EfTransactionRepository>();
         services.AddScoped<EmailIngestionService>();
 
         return services;
     }
 
+    /// <summary>
+    /// Crea la cartella del file SQLite se manca. Senza, la prima esecuzione muore con un
+    /// "unable to open database file" che non dice quale sia il vero problema.
+    /// </summary>
+    private static void EnsureSqliteDirectory(string connectionString)
+    {
+        var builder = new SqliteConnectionStringBuilder(connectionString);
+        if (string.IsNullOrWhiteSpace(builder.DataSource) || builder.DataSource == ":memory:")
+        {
+            return;
+        }
+
+        var directory = Path.GetDirectoryName(Path.GetFullPath(builder.DataSource));
+        if (!string.IsNullOrEmpty(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+    }
+
     private static void AddPersistence(IServiceCollection services, IConfiguration configuration)
     {
         var provider = configuration.GetValue<string>("Database:Provider") ?? "Sqlite";
-        var connectionString = configuration.GetConnectionString("Payments")
+        var connectionString = configuration.GetConnectionString("Transactions")
             ?? throw new InvalidOperationException(
-                "Manca la stringa di connessione 'Payments'. Impostala via variabile d'ambiente "
-                + "ConnectionStrings__Payments oppure con dotnet user-secrets.");
+                "Manca la stringa di connessione 'Transactions'. Impostala via variabile d'ambiente "
+                + "ConnectionStrings__Transactions oppure con dotnet user-secrets.");
 
-        services.AddDbContext<PaymentsDbContext>(options =>
+        services.AddDbContext<TransactionsDbContext>(options =>
         {
             switch (provider.ToUpperInvariant())
             {
@@ -63,6 +87,7 @@ public static class DependencyInjection
                     options.UseNpgsql(connectionString);
                     break;
                 case "SQLITE":
+                    EnsureSqliteDirectory(connectionString);
                     options.UseSqlite(connectionString);
                     break;
                 default:

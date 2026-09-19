@@ -14,7 +14,8 @@ public static partial class AmountParser
 {
     private const string NumberPattern = @"\d{1,3}(?:[.,  ]\d{3})+(?:[.,]\d{1,2})?|\d+(?:[.,]\d{1,2})?";
 
-    private const string CurrencyPattern = @"€|\$|£|\bEUR\b|\bUSD\b|\bGBP\b|\bCHF\b";
+    // "euro" per esteso serve davvero: e' cosi' che ING scrive gli importi nelle sue notifiche.
+    private const string CurrencyPattern = @"€|\$|£|\bEURO\b|\bEUR\b|\bUSD\b|\bGBP\b|\bCHF\b";
 
     [GeneratedRegex(
         $"(?:(?<curBefore>{CurrencyPattern})\\s*(?<numAfter>{NumberPattern}))|(?:(?<numBefore>{NumberPattern})\\s*(?<curAfter>{CurrencyPattern}))",

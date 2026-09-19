@@ -25,6 +25,16 @@ public readonly record struct Money(decimal Amount, string Currency)
         return new Money(decimal.Round(amount, 2, MidpointRounding.ToEven), normalized);
     }
 
+    /// <summary>
+    /// L'importo in centesimi. E' questa la forma che va a database: gli interi sono esatti,
+    /// ordinabili e sommabili su qualsiasi motore, mentre SQLite tiene i decimal come testo
+    /// e ne sbaglia sia l'ordinamento sia la somma.
+    /// </summary>
+    public long Cents => (long)decimal.Round(Amount * 100m, 0, MidpointRounding.ToEven);
+
+    /// <summary>Ricostruisce un importo dai centesimi salvati.</summary>
+    public static Money FromCents(long cents, string currency) => Create(cents / 100m, currency);
+
     public override string ToString() =>
         string.Create(CultureInfo.GetCultureInfo("it-IT"), $"{Amount:N2} {Currency}");
 }

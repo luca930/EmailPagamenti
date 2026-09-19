@@ -14,22 +14,22 @@ namespace EmailPagamenti.Application.Pipeline;
 public sealed record IngestionResult(int Fetched, int Stored, int Duplicates, int Ignored, TimeSpan Elapsed);
 
 /// <summary>
-/// Orchestratore: legge dalla sorgente, deduplica, classifica e salva.
+/// Orchestratore: legge dalla casella, deduplica, ricostruisce i movimenti e li salva.
 /// Lavora a lotti per tenere basso l'uso di memoria anche su caselle molto grandi.
 /// </summary>
 public sealed class EmailIngestionService
 {
     private readonly IEmailSource _source;
-    private readonly IPaymentExtractor _extractor;
-    private readonly IPaymentEmailRepository _repository;
+    private readonly ITransactionExtractor _extractor;
+    private readonly ITransactionRepository _repository;
     private readonly IOptionsMonitor<IngestionOptions> _options;
     private readonly TimeProvider _timeProvider;
     private readonly ILogger<EmailIngestionService> _logger;
 
     public EmailIngestionService(
         IEmailSource source,
-        IPaymentExtractor extractor,
-        IPaymentEmailRepository repository,
+        ITransactionExtractor extractor,
+        ITransactionRepository repository,
         IOptionsMonitor<IngestionOptions> options,
         TimeProvider timeProvider,
         ILogger<EmailIngestionService> logger)
@@ -108,7 +108,7 @@ public sealed class EmailIngestionService
         var stored = 0;
         var duplicates = 0;
         var ignored = 0;
-        var now = _timeProvider.GetUtcNow();
+        var now = _timeProvider.GetUtcNow().UtcDateTime;
 
         for (var i = 0; i < batch.Count; i++)
         {
@@ -131,7 +131,7 @@ public sealed class EmailIngestionService
                 continue;
             }
 
-            var entity = PaymentEmail.Create(
+            var entity = Transaction.Create(
                 raw.MessageId,
                 hash,
                 raw.Folder,
@@ -144,7 +144,7 @@ public sealed class EmailIngestionService
 
             foreach (var attachment in raw.Attachments)
             {
-                entity.AddAttachment(PaymentAttachment.Create(attachment.FileName, attachment.ContentType));
+                entity.AddAttachment(TransactionAttachment.Create(attachment.FileName, attachment.ContentType));
             }
 
             if (extraction.Confidence < options.ReviewThreshold)
@@ -159,10 +159,14 @@ public sealed class EmailIngestionService
                     extraction.Kind,
                     extraction.Total,
                     extraction.Merchant,
+                    extraction.Category,
+                    extraction.CardLast4,
+                    extraction.BalanceAfter,
+                    extraction.ValueDate,
                     extraction.Reference,
                     extraction.Confidence,
                     extraction.MatchedRule,
-                    needsReview: extraction.Confidence < options.MinConfidence);
+                    needsReview: extraction.Confidence < options.MinConfidence || extraction.Total is null);
                 stored++;
             }
 
@@ -173,14 +177,14 @@ public sealed class EmailIngestionService
         return (stored, duplicates, ignored);
     }
 
-    private async Task<DateTimeOffset> ResolveStartingPointAsync(
+    private async Task<DateTime> ResolveStartingPointAsync(
         IngestionOptions options,
         CancellationToken cancellationToken)
     {
         var last = await _repository.GetLastSentAtAsync(cancellationToken).ConfigureAwait(false);
         return last is { } value
             ? value - options.Overlap
-            : _timeProvider.GetUtcNow() - options.InitialLookback;
+            : _timeProvider.GetUtcNow().UtcDateTime - options.InitialLookback;
     }
 
     private static string? Snippet(string? body, int maxLength)

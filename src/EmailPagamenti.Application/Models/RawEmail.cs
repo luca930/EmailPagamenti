@@ -7,7 +7,7 @@ public sealed record RawEmail(
     string Sender,
     string? SenderDisplayName,
     string Subject,
-    DateTimeOffset SentAt,
+    DateTime SentAt,
     string? TextBody,
     IReadOnlyList<RawAttachment> Attachments)
 {
