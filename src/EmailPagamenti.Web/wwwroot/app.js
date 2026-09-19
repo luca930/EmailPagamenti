@@ -339,13 +339,18 @@ async function salvaCorrezione() {
 
   const importo = el('dettaglio-modifica-importo').value;
 
+  if (importo === '' || Number(importo) <= 0) {
+    avvisa('Serve un importo maggiore di zero per confermare la correzione.');
+    return;
+  }
+
   try {
     await chiedi(`/api/transactions/${stato.selezionato.id}`, {
       method: 'PUT',
       body: JSON.stringify({
         direction: el('dettaglio-verso').value,
         kind: stato.selezionato.kind,
-        amount: importo === '' ? null : Number(importo),
+        amount: Number(importo),
         currency: stato.selezionato.currency || 'EUR',
         merchant: el('dettaglio-esercente').value.trim() || null,
         category: el('dettaglio-categoria').value,

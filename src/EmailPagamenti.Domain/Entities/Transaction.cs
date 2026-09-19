@@ -191,23 +191,20 @@ public sealed class Transaction
     /// <summary>
     /// Correzione fatta da una persona nell'interfaccia. Porta il movimento a
     /// <see cref="ProcessingStatus.Classified"/>: quello che conferma un umano non va piu' rivisto.
+    /// L'importo e' obbligatorio: senza, il movimento sparirebbe dai totali pur risultando
+    /// "confermato" invece che "da rivedere".
     /// </summary>
     public void ApplyManualCorrection(
         PaymentDirection direction,
         TransactionKind kind,
-        Money? money,
+        Money money,
         string? merchant,
         string category)
     {
         Direction = direction;
         Kind = kind;
-
-        if (money is { } value)
-        {
-            AmountCents = value.Cents;
-            Currency = value.Currency;
-        }
-
+        AmountCents = money.Cents;
+        Currency = money.Currency;
         Merchant = merchant;
         Category = string.IsNullOrWhiteSpace(category) ? SpendingCategory.Uncategorized : category;
         Status = ProcessingStatus.Classified;

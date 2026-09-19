@@ -111,11 +111,12 @@ public static class ApiEndpoints
                 return Results.BadRequest(new { errore = "Verso o tipo di movimento non validi." });
             }
 
-            Money? money = null;
-            if (correction.Amount is { } amount and > 0m)
+            if (correction.Amount is not ({ } amount and > 0m))
             {
-                money = Money.Create(amount, string.IsNullOrWhiteSpace(correction.Currency) ? "EUR" : correction.Currency);
+                return Results.BadRequest(new { errore = "Serve un importo maggiore di zero per confermare la correzione." });
             }
+
+            var money = Money.Create(amount, string.IsNullOrWhiteSpace(correction.Currency) ? "EUR" : correction.Currency);
 
             found.ApplyManualCorrection(direction, kind, money, correction.Merchant, correction.Category);
             await repository.SaveChangesAsync(cancellationToken);

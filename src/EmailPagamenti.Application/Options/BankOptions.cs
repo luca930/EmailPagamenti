@@ -49,8 +49,9 @@ public sealed class BankProfile
 }
 
 /// <summary>
-/// Una formula che riconosce un tipo di movimento. Il gruppo <c>amount</c> e' obbligatorio,
-/// <c>merchant</c> e' facoltativo.
+/// Una formula che riconosce un tipo di movimento. I gruppi <c>amount</c> e <c>merchant</c>
+/// sono entrambi facoltativi: quello che la formula non cattura viene cercato dalle
+/// espressioni di arricchimento comuni (vedi <see cref="EnrichmentPatterns"/>).
 /// </summary>
 public sealed class TransactionPattern
 {

@@ -159,6 +159,17 @@ public sealed class RepositoryAggregationTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task LaRicercaPerTestoNonTrattaICaratteriJollyDiChiCerca()
+    {
+        // "%" e "_" sono jolly per LIKE: senza escape, cercare "100%" tornerebbe quasi tutto.
+        var found = await _repository.SearchAsync(
+            new TransactionQuery { Text = "100%" },
+            CancellationToken.None);
+
+        Assert.Empty(found);
+    }
+
+    [Fact]
     public async Task LaCorrezioneManualeChiudeLaRevisione()
     {
         // La ricerca torna entita' non tracciate, apposta: per modificarne una la si ricarica.

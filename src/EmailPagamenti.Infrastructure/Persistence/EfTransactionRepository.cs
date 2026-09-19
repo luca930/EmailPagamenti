@@ -197,6 +197,10 @@ public sealed class EfTransactionRepository : ITransactionRepository
 
     private static long Cents(decimal amount) => (long)decimal.Round(amount * 100m, 0, MidpointRounding.ToEven);
 
+    /// <summary>Sfugge i caratteri jolly di LIKE (%, _ e lo stesso escape) prima di usarli in un pattern.</summary>
+    private static string EscapeLikePattern(string value) =>
+        value.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
+
     /// <summary>
     /// I movimenti che contano nei totali: classificati o da rivedere, con un importo, e non
     /// rifiutati. Un pagamento negato non e' una spesa e falserebbe ogni cifra della dashboard.
@@ -220,11 +224,13 @@ public sealed class EfTransactionRepository : ITransactionRepository
 
         if (!string.IsNullOrWhiteSpace(query.Text))
         {
-            var text = query.Text.Trim();
+            // Senza escape, un utente che cerca "100%" o "così_com'è" otterrebbe wildcard
+            // impreviste invece di un confronto letterale.
+            var text = EscapeLikePattern(query.Text.Trim());
             q = q.Where(e =>
-                (e.Merchant != null && EF.Functions.Like(e.Merchant, $"%{text}%"))
-                || EF.Functions.Like(e.Subject, $"%{text}%")
-                || (e.Reference != null && EF.Functions.Like(e.Reference, $"%{text}%")));
+                (e.Merchant != null && EF.Functions.Like(e.Merchant, $"%{text}%", "\\"))
+                || EF.Functions.Like(e.Subject, $"%{text}%", "\\")
+                || (e.Reference != null && EF.Functions.Like(e.Reference, $"%{text}%", "\\")));
         }
 
         if (!string.IsNullOrWhiteSpace(query.Merchant))
