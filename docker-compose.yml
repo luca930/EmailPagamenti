@@ -28,8 +28,14 @@ services:
       ConnectionStrings__Transactions: "Host=postgres-condiviso;Port=5432;Database=emailpagamenti;Username=${DB_UTENTE:-emailpagamenti};Password=${DB_PASSWORD:?serve DB_PASSWORD nel file .env}"
 
       # --- Acquisizione ---
+      Ingestion__Enabled: ${ACQUISIZIONE_ATTIVA:-true}
       Ingestion__PollInterval: ${INTERVALLO:-00:15:00}
       Ingestion__InitialLookback: ${STORICO_INIZIALE:-365.00:00:00}
+
+      # --- Demo ---
+      # Acceso, riempie un database vuoto con movimenti d'esempio invece di leggere la posta.
+      # Vedi "Provarla subito, senza una casella di posta vera" nel README.
+      Demo__Seed: ${DEMO_SEED:-false}
 
     volumes:
       # Restano solo gli allegati/il vuoto di lavoro locale: il database vero sta su

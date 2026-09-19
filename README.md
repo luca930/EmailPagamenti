@@ -110,6 +110,26 @@ Il bottone **Aggiorna** forza una lettura immediata.
 5. Se non arriva nulla, il sospetto numero uno e' `Imap__UserName`/`Imap__Password`:
    `docker compose logs spese | grep -i imap` mostra l'errore di autenticazione, se c'e'.
 
+### Provarla subito, senza una casella di posta vera
+
+Per vedere la dashboard funzionante prima ancora di collegare la posta, nel `.env` si possono
+accendere due variabili (gia' pronte, commentate, in fondo a `.env.example`):
+
+```bash
+ACQUISIZIONE_ATTIVA=false
+DEMO_SEED=true
+```
+
+Con queste due, all'avvio l'applicazione riempie da sola un database vuoto con una ventina di
+movimenti d'esempio (spesa, benzina, abbonamenti, uno stipendio, un paio "da rivedere" per
+provare la correzione a mano) invece di leggere la posta. `IMAP_HOST`/`IMAP_UTENTE`/
+`IMAP_PASSWORD` restano obbligatori nel `.env` ma possono essere finti, perche' con
+l'acquisizione spenta non vengono mai usati davvero.
+
+Il seme parte solo se il database e' vuoto: per passare alla posta vera piu' avanti basta
+rimettere `ACQUISIZIONE_ATTIVA=true` (o toglierla, e' il default) e ripartire da un database
+pulito, altrimenti i movimenti d'esempio restano insieme a quelli veri.
+
 ## Sviluppo
 
 ```bash
@@ -123,7 +143,9 @@ dotnet run
 ```
 
 Per lavorare sull'interfaccia senza collegare la posta, basta spegnere l'acquisizione con
-`Ingestion__Enabled=false`.
+`Ingestion__Enabled=false`. Aggiungendo anche `Demo__Seed=true` (stesso comando, con
+`dotnet user-secrets set` o una variabile d'ambiente), la dashboard si riempie da sola con dati
+d'esempio: e' il modo piu' rapido di vederla funzionare, senza Docker e senza posta.
 
 ## Struttura
 
@@ -154,6 +176,7 @@ Tutto quello che non e' un segreto sta in `appsettings.json`.
 | `Banks` | `Profiles` | Profili delle banche. |
 | `Categories` | `Rules` | Categoria per parole chiave sull'esercente. |
 | `Database` | `Provider` | `Sqlite` oppure `Postgres`. |
+| `Demo` | `Seed` | Riempie un database vuoto con movimenti d'esempio invece di leggere la posta. |
 
 Aggiungere un esercente a una categoria:
 

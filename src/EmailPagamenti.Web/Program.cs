@@ -137,6 +137,13 @@ static async Task PrepareDatabaseAsync(WebApplication app)
         app.Logger.LogWarning("Nessuna migrazione trovata: lo schema viene creato con EnsureCreated.");
         await db.Database.EnsureCreatedAsync().ConfigureAwait(false);
     }
+
+    if (app.Configuration.GetValue<bool>("Demo:Seed"))
+    {
+        app.Logger.LogWarning("Demo__Seed e' attivo: il database viene popolato con movimenti di esempio.");
+        var time = scope.ServiceProvider.GetRequiredService<TimeProvider>();
+        await DemoData.SeedIfEmptyAsync(db, time, CancellationToken.None).ConfigureAwait(false);
+    }
 }
 
 /// <summary>Corpo della richiesta di accesso.</summary>
