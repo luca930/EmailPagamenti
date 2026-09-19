@@ -1,0 +1,51 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmailPagamenti.Domain", "src\EmailPagamenti.Domain\EmailPagamenti.Domain.csproj", "{3084C6E6-F7B5-4522-A693-32A383FEA623}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmailPagamenti.Application", "src\EmailPagamenti.Application\EmailPagamenti.Application.csproj", "{62874FDE-7387-49EF-82F6-609A916F0FD6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmailPagamenti.Infrastructure", "src\EmailPagamenti.Infrastructure\EmailPagamenti.Infrastructure.csproj", "{0028B610-39BE-43B0-94B5-8A28E48B3814}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmailPagamenti.Worker", "src\EmailPagamenti.Worker\EmailPagamenti.Worker.csproj", "{4E84B95A-A1CA-4001-ACBF-C534A5404B9A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EmailPagamenti.Tests", "tests\EmailPagamenti.Tests\EmailPagamenti.Tests.csproj", "{C688730F-BD3A-4350-BBA7-423F3ABF600E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AC65167C-2C57-40E4-B928-E83910E003B3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{83D11CE5-C6E7-4DB4-85EC-120458648726}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3084C6E6-F7B5-4522-A693-32A383FEA623}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3084C6E6-F7B5-4522-A693-32A383FEA623}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3084C6E6-F7B5-4522-A693-32A383FEA623}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3084C6E6-F7B5-4522-A693-32A383FEA623}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62874FDE-7387-49EF-82F6-609A916F0FD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62874FDE-7387-49EF-82F6-609A916F0FD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62874FDE-7387-49EF-82F6-609A916F0FD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62874FDE-7387-49EF-82F6-609A916F0FD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0028B610-39BE-43B0-94B5-8A28E48B3814}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0028B610-39BE-43B0-94B5-8A28E48B3814}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0028B610-39BE-43B0-94B5-8A28E48B3814}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0028B610-39BE-43B0-94B5-8A28E48B3814}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E84B95A-A1CA-4001-ACBF-C534A5404B9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E84B95A-A1CA-4001-ACBF-C534A5404B9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E84B95A-A1CA-4001-ACBF-C534A5404B9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E84B95A-A1CA-4001-ACBF-C534A5404B9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C688730F-BD3A-4350-BBA7-423F3ABF600E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C688730F-BD3A-4350-BBA7-423F3ABF600E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C688730F-BD3A-4350-BBA7-423F3ABF600E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C688730F-BD3A-4350-BBA7-423F3ABF600E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3084C6E6-F7B5-4522-A693-32A383FEA623} = {AC65167C-2C57-40E4-B928-E83910E003B3}
+		{62874FDE-7387-49EF-82F6-609A916F0FD6} = {AC65167C-2C57-40E4-B928-E83910E003B3}
+		{0028B610-39BE-43B0-94B5-8A28E48B3814} = {AC65167C-2C57-40E4-B928-E83910E003B3}
+		{4E84B95A-A1CA-4001-ACBF-C534A5404B9A} = {AC65167C-2C57-40E4-B928-E83910E003B3}
+		{C688730F-BD3A-4350-BBA7-423F3ABF600E} = {83D11CE5-C6E7-4DB4-85EC-120458648726}
+	EndGlobalSection
+EndGlobal

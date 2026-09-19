@@ -1,0 +1,45 @@
+## .NET
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+artifacts/
+*.user
+*.suo
+*.userprefs
+project.lock.json
+project.fragment.lock.json
+.vs/
+.vscode/
+.idea/
+*.swp
+*.DS_Store
+
+## Test / coverage
+TestResults/
+coverage/
+*.coverage
+*.trx
+*.opencover.xml
+
+## Segreti e configurazioni locali: non devono MAI finire nel repository
+appsettings.Local.json
+appsettings.*.Local.json
+appsettings.Development.json
+secrets.json
+*.pfx
+*.p12
+*.key
+*.pem
+.env
+.env.*
+!.env.example
+
+## Database locali
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
