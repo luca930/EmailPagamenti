@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\EmailPagamenti.Application\EmailPagamenti.Application.csproj" />
+    <ProjectReference Include="..\..\src\EmailPagamenti.Infrastructure\EmailPagamenti.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

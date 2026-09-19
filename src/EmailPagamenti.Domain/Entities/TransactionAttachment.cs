@@ -1,12 +1,12 @@
 namespace EmailPagamenti.Domain.Entities;
 
 /// <summary>
-/// Metadati di un allegato. Il file non viene scaricato ne' salvato dalla pipeline
-/// di base: si tiene traccia di cosa c'era, non del contenuto.
+/// Metadati di un allegato, ad esempio la contabile in PDF di un bonifico. Il file non viene
+/// scaricato ne' salvato: si tiene traccia di cosa c'era, non del contenuto.
 /// </summary>
-public sealed class PaymentAttachment
+public sealed class TransactionAttachment
 {
-    private PaymentAttachment()
+    private TransactionAttachment()
     {
         FileName = string.Empty;
         ContentType = string.Empty;
@@ -14,13 +14,13 @@ public sealed class PaymentAttachment
 
     public Guid Id { get; private set; }
 
-    public Guid PaymentEmailId { get; private set; }
+    public Guid TransactionId { get; private set; }
 
     public string FileName { get; private set; }
 
     public string ContentType { get; private set; }
 
-    public static PaymentAttachment Create(string fileName, string contentType) =>
+    public static TransactionAttachment Create(string fileName, string contentType) =>
         new()
         {
             Id = Guid.CreateVersion7(),

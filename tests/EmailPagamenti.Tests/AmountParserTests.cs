@@ -15,6 +15,8 @@ public sealed class AmountParserTests
     [InlineData("Amount: 99.99 USD", "99.99", "USD")]
     [InlineData("Pagati 12,50\u20AC per il caffe", "12.50", "EUR")]
     [InlineData("Canone di 9 \u20AC al mese", "9", "EUR")]
+    [InlineData("Importo: 1.250,00 euro", "1250.00", "EUR")]
+    [InlineData("Pagamento di 49,90 EURO", "49.90", "EUR")]
     public void RiconosceIFormatiPiuComuni(string text, string expected, string currency)
     {
         var atteso = decimal.Parse(expected, CultureInfo.InvariantCulture);

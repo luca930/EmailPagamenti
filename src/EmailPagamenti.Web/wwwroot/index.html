@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <title>Spese</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+</head>
+<body data-stato="caricamento">
+
+<div id="accesso" class="accesso" hidden>
+  <form class="accesso-riquadro" id="modulo-accesso" autocomplete="on">
+    <h1 class="accesso-titolo">Spese</h1>
+    <p class="accesso-sotto">Inserisci la password per vedere i tuoi movimenti.</p>
+    <label class="campo">
+      <span class="campo-etichetta">Password</span>
+      <input type="password" id="password" name="password" autocomplete="current-password" required>
+    </label>
+    <button type="submit" class="bottone bottone-primario">Entra</button>
+    <p class="accesso-errore" id="accesso-errore" role="alert" hidden>Password non corretta.</p>
+  </form>
+</div>
+
+<div id="applicazione" hidden>
+  <header class="intestazione">
+    <div class="intestazione-riga">
+      <h1 class="titolo">Spese</h1>
+      <div class="intestazione-azioni">
+        <button type="button" class="bottone bottone-quieto" id="aggiorna" title="Leggi ora le nuove email">Aggiorna</button>
+        <button type="button" class="bottone bottone-quieto" id="tema" aria-label="Cambia tema">Tema</button>
+        <button type="button" class="bottone bottone-quieto" id="esci">Esci</button>
+      </div>
+    </div>
+
+    <nav class="periodo" aria-label="Periodo">
+      <button type="button" class="periodo-freccia" id="mese-precedente" aria-label="Mese precedente">‹</button>
+      <span class="periodo-nome" id="periodo-nome">—</span>
+      <button type="button" class="periodo-freccia" id="mese-successivo" aria-label="Mese successivo">›</button>
+    </nav>
+  </header>
+
+  <main class="contenuto">
+    <section class="cifre" aria-label="Riepilogo del periodo">
+      <article class="cifra">
+        <h2 class="cifra-etichetta">Uscite</h2>
+        <p class="cifra-valore cifra-uscite" id="totale-uscite">—</p>
+        <p class="cifra-nota" id="nota-uscite">&nbsp;</p>
+      </article>
+      <article class="cifra">
+        <h2 class="cifra-etichetta">Entrate</h2>
+        <p class="cifra-valore cifra-entrate" id="totale-entrate">—</p>
+        <p class="cifra-nota">&nbsp;</p>
+      </article>
+      <article class="cifra">
+        <h2 class="cifra-etichetta">Saldo</h2>
+        <p class="cifra-valore" id="totale-saldo">—</p>
+        <p class="cifra-nota" id="nota-saldo">&nbsp;</p>
+      </article>
+      <article class="cifra">
+        <h2 class="cifra-etichetta">Movimenti</h2>
+        <p class="cifra-valore" id="totale-movimenti">—</p>
+        <p class="cifra-nota"><button type="button" class="collegamento" id="vai-revisione" hidden></button></p>
+      </article>
+    </section>
+
+    <section class="riquadro" aria-labelledby="titolo-categorie">
+      <div class="riquadro-testa">
+        <h2 class="riquadro-titolo" id="titolo-categorie">Dove sono finiti i soldi</h2>
+        <p class="riquadro-sotto">Uscite del periodo, per categoria.</p>
+      </div>
+      <div id="grafico-categorie" class="grafico"></div>
+      <p class="vuoto" id="categorie-vuoto" hidden>Nessuna uscita in questo periodo.</p>
+    </section>
+
+    <section class="riquadro" aria-labelledby="titolo-andamento">
+      <div class="riquadro-testa">
+        <h2 class="riquadro-titolo" id="titolo-andamento">Mese per mese</h2>
+        <p class="riquadro-sotto">Ultimi dodici mesi.</p>
+        <div class="legenda" id="legenda-andamento">
+          <span class="legenda-voce"><span class="legenda-segno legenda-uscite"></span>Uscite</span>
+          <span class="legenda-voce"><span class="legenda-segno legenda-entrate"></span>Entrate</span>
+        </div>
+      </div>
+      <div id="grafico-andamento" class="grafico"></div>
+    </section>
+
+    <section class="riquadro" aria-labelledby="titolo-movimenti">
+      <div class="riquadro-testa">
+        <h2 class="riquadro-titolo" id="titolo-movimenti">Movimenti</h2>
+      </div>
+
+      <div class="filtri">
+        <label class="campo campo-cerca">
+          <span class="campo-etichetta">Cerca</span>
+          <input type="search" id="filtro-testo" placeholder="Esercente, oggetto, riferimento">
+        </label>
+        <label class="campo">
+          <span class="campo-etichetta">Categoria</span>
+          <select id="filtro-categoria"><option value="">Tutte</option></select>
+        </label>
+        <label class="campo">
+          <span class="campo-etichetta">Verso</span>
+          <select id="filtro-verso">
+            <option value="">Tutti</option>
+            <option value="Outgoing">Uscite</option>
+            <option value="Incoming">Entrate</option>
+          </select>
+        </label>
+        <label class="campo campo-stretto">
+          <span class="campo-etichetta">Da €</span>
+          <input type="number" id="filtro-min" min="0" step="0.01" inputmode="decimal">
+        </label>
+        <label class="campo campo-stretto">
+          <span class="campo-etichetta">A €</span>
+          <input type="number" id="filtro-max" min="0" step="0.01" inputmode="decimal">
+        </label>
+        <label class="interruttore">
+          <input type="checkbox" id="filtro-revisione">
+          <span>Solo da rivedere</span>
+        </label>
+      </div>
+
+      <div class="tabella-contenitore">
+        <table class="tabella">
+          <caption class="solo-lettori">Movimenti del periodo selezionato</caption>
+          <thead>
+            <tr>
+              <th scope="col">Data</th>
+              <th scope="col">Esercente</th>
+              <th scope="col">Categoria</th>
+              <th scope="col" class="destra">Importo</th>
+            </tr>
+          </thead>
+          <tbody id="corpo-movimenti"></tbody>
+        </table>
+      </div>
+
+      <p class="vuoto" id="movimenti-vuoto" hidden>Nessun movimento con questi filtri.</p>
+
+      <div class="paginazione">
+        <button type="button" class="bottone bottone-quieto" id="pagina-precedente">Precedenti</button>
+        <span class="paginazione-stato" id="paginazione-stato">—</span>
+        <button type="button" class="bottone bottone-quieto" id="pagina-successiva">Successivi</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<dialog id="dettaglio" class="dettaglio">
+  <form method="dialog" class="dettaglio-chiudi-modulo">
+    <button class="dettaglio-chiudi" aria-label="Chiudi">×</button>
+  </form>
+  <div class="dettaglio-corpo">
+    <p class="dettaglio-data" id="dettaglio-data"></p>
+    <p class="dettaglio-importo" id="dettaglio-importo"></p>
+    <p class="dettaglio-oggetto" id="dettaglio-oggetto"></p>
+
+    <div class="dettaglio-campi">
+      <label class="campo">
+        <span class="campo-etichetta">Esercente</span>
+        <input type="text" id="dettaglio-esercente">
+      </label>
+      <label class="campo">
+        <span class="campo-etichetta">Categoria</span>
+        <select id="dettaglio-categoria"></select>
+      </label>
+      <label class="campo">
+        <span class="campo-etichetta">Importo €</span>
+        <input type="number" id="dettaglio-modifica-importo" min="0" step="0.01" inputmode="decimal">
+      </label>
+      <label class="campo">
+        <span class="campo-etichetta">Verso</span>
+        <select id="dettaglio-verso">
+          <option value="Outgoing">Uscita</option>
+          <option value="Incoming">Entrata</option>
+        </select>
+      </label>
+    </div>
+
+    <p class="dettaglio-regola" id="dettaglio-regola"></p>
+
+    <div class="dettaglio-azioni">
+      <button type="button" class="bottone bottone-primario" id="dettaglio-salva">Conferma</button>
+    </div>
+  </div>
+</dialog>
+
+<div class="avviso" id="avviso" role="status" hidden></div>
+
+<script src="app.js" type="module"></script>
+</body>
+</html>

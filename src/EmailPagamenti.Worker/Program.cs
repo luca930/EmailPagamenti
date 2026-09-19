@@ -18,7 +18,7 @@ await host.RunAsync().ConfigureAwait(false);
 static async Task PrepareDatabaseAsync(IHost host)
 {
     using var scope = host.Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<PaymentsDbContext>();
+    var db = scope.ServiceProvider.GetRequiredService<TransactionsDbContext>();
 
     // Finche' non esiste una migrazione (dotnet ef migrations add Iniziale) si crea lo schema
     // direttamente, cosi' il progetto parte appena clonato. In produzione servono le migrazioni.

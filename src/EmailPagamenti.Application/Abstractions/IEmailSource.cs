@@ -15,5 +15,5 @@ public interface IEmailSource
     /// Restituisce le email ricevute a partire da <paramref name="since"/>, in streaming:
     /// non carica l'intera casella in memoria.
     /// </summary>
-    IAsyncEnumerable<RawEmail> FetchAsync(DateTimeOffset since, CancellationToken cancellationToken);
+    IAsyncEnumerable<RawEmail> FetchAsync(DateTime since, CancellationToken cancellationToken);
 }
